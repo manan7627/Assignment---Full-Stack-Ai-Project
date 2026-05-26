@@ -102,13 +102,15 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 // Create assignment
 app.post('/api/assignments', async (req, res) => {
   try {
-    const { dueDate, questionTypes, totalQuestions, totalMarks, additionalInstructions, fileContent, title } = req.body;
+    const { dueDate, questionTypes, totalQuestions, totalMarks, additionalInstructions, fileContent, title, subject, grade } = req.body;
 
     const autoTitle = title || `Assessment - ${new Date(dueDate).toLocaleDateString()}`;
 
     const assignment = new Assignment({
       title: autoTitle,
       dueDate,
+      subject: subject || 'General',
+      grade: grade || '8th',
       questionTypes,
       totalQuestions,
       totalMarks,

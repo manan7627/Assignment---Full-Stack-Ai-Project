@@ -125,8 +125,8 @@ export default function Paper() {
           <div className={styles.paperContent} ref={paperRef}>
             <div className={styles.schoolHeader}>
               <div className={styles.schoolName}>Institution Assessment Paper</div>
-              <div className={styles.subjectClass}>Subject: Science</div>
-              <div className={styles.subjectClass}>Class: 8th</div>
+              <div className={styles.subjectClass}>Subject: {paperData.subject || 'Science'}</div>
+              <div className={styles.subjectClass}>Class: {paperData.grade || '8th'}</div>
             </div>
 
             <div className={styles.metaInfo}>
@@ -141,7 +141,7 @@ export default function Paper() {
             <div className={styles.studentDetails}>
               <div className={styles.inputLine}>Name: <div className={styles.line}></div></div>
               <div className={styles.inputLine}>Roll Number: <div className={styles.line}></div></div>
-              <div className={styles.inputLine}>Class: 8th Section: <div className={styles.line}></div></div>
+              <div className={styles.inputLine}>Class: {paperData.grade || '8th'} Section: <div className={styles.line}></div></div>
             </div>
 
             {paperData.sections?.map((section: any, sIdx: number) => (

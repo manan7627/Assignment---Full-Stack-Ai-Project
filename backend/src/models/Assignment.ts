@@ -16,6 +16,7 @@ export interface IAssignment extends Document {
   status: 'PENDING' | 'GENERATING' | 'COMPLETED' | 'FAILED';
   title: string;
   subject: string;
+  grade: string;
   fileContent: string;
   dueDate: Date;
   questionTypes: string[];
@@ -44,6 +45,7 @@ const AssignmentSchema: Schema = new Schema({
   status: { type: String, enum: ['PENDING', 'GENERATING', 'COMPLETED', 'FAILED'], default: 'PENDING' },
   title: { type: String, default: '' },
   subject: { type: String, default: 'General' },
+  grade: { type: String, default: '8th' },
   fileContent: { type: String, default: '' },
   dueDate: { type: Date, required: true },
   questionTypes: { type: [String], required: true },

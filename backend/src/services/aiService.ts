@@ -13,6 +13,8 @@ export const generateAssessmentPaper = async (
   totalMarks: number,
   questionTypes: string[],
   additionalInstructions: string,
+  subject: string,
+  grade: string,
   fileContent?: string
 ) => {
   const model = genAI.getGenerativeModel({
@@ -64,6 +66,10 @@ export const generateAssessmentPaper = async (
   });
 
   const prompt = `
+    Generate an official exam paper for:
+    - Subject: ${subject}
+    - Student Grade/Class: ${grade}
+    
     ${fileContent ? `Reference Material (use this as context for generating questions):\n${fileContent}\n---\n` : ''}
     Generate an assessment paper based on the following requirements:
     - Total Questions: ${totalQuestions}
@@ -71,6 +77,7 @@ export const generateAssessmentPaper = async (
     - Question Types: ${questionTypes.join(', ')}
     - Additional Instructions: ${additionalInstructions}
     
+    Ensure that the questions generated are educational, age-appropriate for ${grade}, and cover topics strictly related to the subject: ${subject}.
     Ensure that the sum of marks for all questions exactly matches ${totalMarks}, and the total number of questions exactly matches ${totalQuestions}.
     Distribute the questions into logical sections based on question types or difficulty.
   `;

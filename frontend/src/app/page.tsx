@@ -13,6 +13,10 @@ function HomeContent() {
   const { 
     dueDate, 
     setDueDate, 
+    subject,
+    setSubject,
+    grade,
+    setGrade,
     questionTypes, 
     updateQuestionType, 
     additionalInstructions, 
@@ -129,7 +133,9 @@ function HomeContent() {
           totalMarks,
           additionalInstructions,
           fileContent,
-          fullQuestionTypes: questionTypes // Send the full payload too
+          fullQuestionTypes: questionTypes, // Send the full payload too
+          subject,
+          grade
         })
       });
 
@@ -247,6 +253,34 @@ function HomeContent() {
               )}
             </div>
             <div className={styles.uploadHint}>Upload documents (syllabus/notes) to guide AI generation</div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+                <label className={styles.label}>Subject</label>
+                <div className={styles.inputWrapper}>
+                  <input 
+                    type="text" 
+                    className={styles.dateInput} 
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="e.g. Science, Mathematics, English"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGroup} style={{ marginBottom: 0 }}>
+                <label className={styles.label}>Class / Grade</label>
+                <div className={styles.inputWrapper}>
+                  <input 
+                    type="text" 
+                    className={styles.dateInput} 
+                    value={grade}
+                    onChange={(e) => setGrade(e.target.value)}
+                    placeholder="e.g. 8th, 10th, 12th"
+                  />
+                </div>
+              </div>
+            </div>
 
             <div className={styles.formGroup}>
               <label className={styles.label}>Due Date</label>

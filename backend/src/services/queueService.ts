@@ -49,6 +49,8 @@ class InMemoryQueue extends EventEmitter {
         assignment.totalMarks,
         assignment.questionTypes,
         assignment.additionalInstructions,
+        assignment.subject || 'General',
+        assignment.grade || '8th',
         assignment.fileContent || ''
       );
 

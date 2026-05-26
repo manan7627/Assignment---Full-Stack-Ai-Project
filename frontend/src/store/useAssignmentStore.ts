@@ -9,6 +9,8 @@ export interface QuestionType {
 
 export interface AssignmentState {
   dueDate: string;
+  subject: string;
+  grade: string;
   questionTypes: QuestionType[];
   additionalInstructions: string;
   assignmentId: string | null;
@@ -18,6 +20,8 @@ export interface AssignmentState {
   uploadedFileName: string;
   
   setDueDate: (date: string) => void;
+  setSubject: (subject: string) => void;
+  setGrade: (grade: string) => void;
   updateQuestionType: (id: string, count: number, marks: number) => void;
   setAdditionalInstructions: (instructions: string) => void;
   setStatus: (status: 'IDLE' | 'PENDING' | 'GENERATING' | 'COMPLETED' | 'FAILED') => void;
@@ -38,6 +42,8 @@ const initialQuestionTypes: QuestionType[] = [
 
 export const useAssignmentStore = create<AssignmentState>((set) => ({
   dueDate: '',
+  subject: 'Science',
+  grade: '8th',
   questionTypes: initialQuestionTypes,
   additionalInstructions: '',
   assignmentId: null,
@@ -47,6 +53,8 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
   uploadedFileName: '',
 
   setDueDate: (date) => set({ dueDate: date }),
+  setSubject: (subject) => set({ subject }),
+  setGrade: (grade) => set({ grade }),
   updateQuestionType: (id, count, marks) => set((state) => ({
     questionTypes: state.questionTypes.map((qt) =>
       qt.id === id ? { ...qt, count, marks } : qt
@@ -79,6 +87,8 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
   }),
   reset: () => set({ 
     dueDate: '', 
+    subject: 'Science',
+    grade: '8th',
     questionTypes: initialQuestionTypes, 
     additionalInstructions: '', 
     assignmentId: null, 
