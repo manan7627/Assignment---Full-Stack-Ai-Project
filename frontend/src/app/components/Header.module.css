@@ -28,6 +28,22 @@
   cursor: pointer;
 }
 
+.menuBtn {
+  display: none;
+  background: none;
+  border: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .menuBtn {
+    display: flex;
+  }
+}
+
 .right {
   display: flex;
   align-items: center;

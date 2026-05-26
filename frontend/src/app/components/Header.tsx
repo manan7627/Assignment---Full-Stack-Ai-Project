@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Bell, ChevronDown, Check, User, Settings as SettingsIcon, LogOut } from 'lucide-react';
+import { ArrowLeft, Bell, ChevronDown, Check, User, Settings as SettingsIcon, LogOut, Menu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAssignmentStore } from '../../store/useAssignmentStore';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -14,6 +15,7 @@ const Header = ({ title = 'Assessment Creator' }: HeaderProps) => {
   const router = useRouter();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const { toggleSidebar } = useAssignmentStore();
   
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -34,6 +36,9 @@ const Header = ({ title = 'Assessment Creator' }: HeaderProps) => {
   return (
     <div className={styles.header}>
       <div className={styles.left}>
+        <button className={styles.menuBtn} onClick={toggleSidebar}>
+          <Menu size={20} />
+        </button>
         <button className={styles.backBtn} onClick={() => router.back()}>
           <ArrowLeft size={20} />
         </button>

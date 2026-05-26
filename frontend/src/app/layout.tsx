@@ -14,9 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body style={{ display: "flex", minHeight: "100vh" }}>
+      <body className="appBody">
         <Sidebar />
-        <main style={{ flex: 1, display: "flex", flexDirection: "column", padding: "16px", marginLeft: "280px" }}>
+        <main className="mainContent">
           {children}
         </main>
       </body>

@@ -18,6 +18,7 @@ export interface AssignmentState {
   paperData: any | null;
   uploadedFile: File | null;
   uploadedFileName: string;
+  sidebarOpen: boolean;
   
   setDueDate: (date: string) => void;
   setSubject: (subject: string) => void;
@@ -30,6 +31,8 @@ export interface AssignmentState {
   addQuestionType: () => void;
   removeQuestionType: (id: string) => void;
   setUploadedFile: (file: File | null) => void;
+  setSidebarOpen: (isOpen: boolean) => void;
+  toggleSidebar: () => void;
   reset: () => void;
 }
 
@@ -51,6 +54,7 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
   paperData: null,
   uploadedFile: null,
   uploadedFileName: '',
+  sidebarOpen: false,
 
   setDueDate: (date) => set({ dueDate: date }),
   setSubject: (subject) => set({ subject }),
@@ -85,6 +89,8 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
     uploadedFile: file,
     uploadedFileName: file ? file.name : '',
   }),
+  setSidebarOpen: (isOpen) => set({ sidebarOpen: isOpen }),
+  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   reset: () => set({ 
     dueDate: '', 
     subject: 'Science',
@@ -96,5 +102,6 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
     paperData: null,
     uploadedFile: null,
     uploadedFileName: '',
+    sidebarOpen: false,
   }),
 }));

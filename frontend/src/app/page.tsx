@@ -169,27 +169,27 @@ function HomeContent() {
             <div className={styles.pageSubtitle}>Welcome back! Here is an overview of your assessments.</div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px', marginBottom: '40px' }}>
-             <div className={styles.card} style={{ padding: '24px' }}>
-                <h3 style={{fontSize: 14, color: 'var(--text-secondary)'}}>Total Assessments</h3>
-                <p style={{fontSize: 32, fontWeight: 'bold', marginTop: 8}}>{recentAssignments.length}</p>
+          <div className={styles.statsGrid}>
+             <div className={styles.statsCard}>
+                <h3 className={styles.statsLabel}>Total Assessments</h3>
+                <p className={styles.statsValue}>{recentAssignments.length}</p>
              </div>
-             <div className={styles.card} style={{ padding: '24px' }}>
-                <h3 style={{fontSize: 14, color: 'var(--text-secondary)'}}>Students Enrolled</h3>
-                <p style={{fontSize: 32, fontWeight: 'bold', marginTop: 8}}>--</p>
+             <div className={styles.statsCard}>
+                <h3 className={styles.statsLabel}>Students Enrolled</h3>
+                <p className={styles.statsValue}>--</p>
              </div>
-             <div className={styles.card} style={{ padding: '24px', background: 'var(--btn-dark)', color: 'white', cursor: 'pointer' }} onClick={() => setView('create')}>
-                <h3 style={{fontSize: 16, color: 'white', display: 'flex', alignItems: 'center', gap: 8}}>
+             <div className={`${styles.statsCard} ${styles.createCard}`} onClick={() => setView('create')}>
+                <h3 className={styles.createLabel}>
                   <Plus size={20} /> Create New Assessment
                 </h3>
-                <p style={{fontSize: 14, color: '#aaa', marginTop: 8}}>Use AI to generate a structured exam paper instantly.</p>
+                <p className={styles.createDesc}>Use AI to generate a structured exam paper instantly.</p>
              </div>
           </div>
 
           <h2 style={{fontSize: 18, marginBottom: 16}}>Recent Assignments</h2>
           <div style={{display: 'flex', flexDirection: 'column', gap: 16}}>
             {recentAssignments.map(a => (
-              <div key={a._id} className={styles.card} style={{padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer'}} onClick={() => router.push(`/paper/${a._id}`)}>
+              <div key={a._id} className={styles.assignmentCard} onClick={() => router.push(`/paper/${a._id}`)}>
                 <div style={{display: 'flex', alignItems: 'center', gap: 16}}>
                   <div style={{padding: 12, background: '#f5f5f5', borderRadius: 12}}>
                     <FileText size={20} color="var(--accent-orange)" />
@@ -254,7 +254,7 @@ function HomeContent() {
             </div>
             <div className={styles.uploadHint}>Upload documents (syllabus/notes) to guide AI generation</div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+            <div className={styles.detailsGrid}>
               <div className={styles.formGroup} style={{ marginBottom: 0 }}>
                 <label className={styles.label}>Subject</label>
                 <div className={styles.inputWrapper}>
