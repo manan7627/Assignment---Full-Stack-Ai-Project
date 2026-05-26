@@ -12,7 +12,8 @@ export const generateAssessmentPaper = async (
   totalQuestions: number,
   totalMarks: number,
   questionTypes: string[],
-  additionalInstructions: string
+  additionalInstructions: string,
+  fileContent?: string
 ) => {
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
@@ -63,6 +64,7 @@ export const generateAssessmentPaper = async (
   });
 
   const prompt = `
+    ${fileContent ? `Reference Material (use this as context for generating questions):\n${fileContent}\n---\n` : ''}
     Generate an assessment paper based on the following requirements:
     - Total Questions: ${totalQuestions}
     - Total Marks: ${totalMarks}

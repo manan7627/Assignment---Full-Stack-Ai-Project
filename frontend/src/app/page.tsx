@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Header from './components/Header';
 import styles from './page.module.css';
 import { CloudUpload, Calendar, ChevronDown, X, Mic, ArrowLeft, ArrowRight, Plus, FileText, Activity } from 'lucide-react';
 import { useAssignmentStore } from '../store/useAssignmentStore';
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { 
     dueDate, 
     setDueDate, 
@@ -17,16 +18,26 @@ export default function Home() {
     additionalInstructions, 
     setAdditionalInstructions,
     setAssignmentId,
-    setStatus
+    setStatus,
+    addQuestionType,
+    removeQuestionType,
+    uploadedFile,
+    uploadedFileName,
+    setUploadedFile
   } = useAssignmentStore();
 
   const [view, setView] = useState<'dashboard' | 'create'>('dashboard');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recentAssignments, setRecentAssignments] = useState<any[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (searchParams.get('view') === 'create') {
+      setView('create');
+    }
     fetchAssignments();
-  }, []);
+  }, [searchParams]);
 
   const fetchAssignments = async () => {
     try {
@@ -55,6 +66,29 @@ export default function Home() {
   const totalQuestions = questionTypes.reduce((sum, qt) => sum + qt.count, 0);
   const totalMarks = questionTypes.reduce((sum, qt) => sum + (qt.count * qt.marks), 0);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setUploadedFile(e.target.files[0]);
+    }
+  };
+
+  const handleVoiceInput = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) { 
+      alert('Speech recognition is not supported in this browser.'); 
+      return; 
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.onstart = () => setIsRecording(true);
+    recognition.onend = () => setIsRecording(false);
+    recognition.onresult = (event: any) => {
+      const text = event.results[0][0].transcript;
+      setAdditionalInstructions(additionalInstructions + (additionalInstructions ? ' ' : '') + text);
+    };
+    recognition.start();
+  };
+
   const handleGenerate = async () => {
     if (!dueDate || totalQuestions === 0) {
       alert("Please enter a due date and ensure there is at least one question.");
@@ -66,15 +100,36 @@ export default function Home() {
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      
+      let fileContent = '';
+      if (uploadedFile) {
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        try {
+          const uploadRes = await fetch(`${apiUrl}/api/upload`, {
+            method: 'POST',
+            body: formData
+          });
+          if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            fileContent = uploadData.extractedText || '';
+          }
+        } catch (uploadErr) {
+          console.error("Upload failed, continuing without file content", uploadErr);
+        }
+      }
+
       const response = await fetch(`${apiUrl}/api/assignments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           dueDate,
-          questionTypes: questionTypes.map(qt => qt.name),
+          questionTypes: questionTypes.map(qt => qt.name), // Still sending names for backward compatibility
           totalQuestions,
           totalMarks,
-          additionalInstructions
+          additionalInstructions,
+          fileContent,
+          fullQuestionTypes: questionTypes // Send the full payload too
         })
       });
 
@@ -115,7 +170,7 @@ export default function Home() {
              </div>
              <div className={styles.card} style={{ padding: '24px' }}>
                 <h3 style={{fontSize: 14, color: 'var(--text-secondary)'}}>Students Enrolled</h3>
-                <p style={{fontSize: 32, fontWeight: 'bold', marginTop: 8}}>142</p>
+                <p style={{fontSize: 32, fontWeight: 'bold', marginTop: 8}}>--</p>
              </div>
              <div className={styles.card} style={{ padding: '24px', background: 'var(--btn-dark)', color: 'white', cursor: 'pointer' }} onClick={() => setView('create')}>
                 <h3 style={{fontSize: 16, color: 'white', display: 'flex', alignItems: 'center', gap: 8}}>
@@ -161,13 +216,37 @@ export default function Home() {
             <div className={styles.sectionTitle}>Assignment Details</div>
             <div className={styles.sectionSubtitle}>Basic information about your assignment</div>
 
-            <div className={styles.uploadZone}>
-              <CloudUpload size={32} color="var(--text-primary)" />
-              <div className={styles.uploadText}>Choose a file or drag & drop it here</div>
-              <div className={styles.uploadSubtext}>JPEG, PNG, upto 10MB</div>
-              <button className={styles.browseBtn}>Browse Files</button>
+            <div className={styles.uploadZone} 
+                 onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add(styles.uploadZoneActive); }}
+                 onDragLeave={(e) => { e.preventDefault(); e.currentTarget.classList.remove(styles.uploadZoneActive); }}
+                 onDrop={(e) => {
+                   e.preventDefault();
+                   e.currentTarget.classList.remove(styles.uploadZoneActive);
+                   if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                     setUploadedFile(e.dataTransfer.files[0]);
+                   }
+                 }}>
+              <input type="file" ref={fileInputRef} style={{display: 'none'}} accept=".pdf,.txt,.png,.jpg,.jpeg" onChange={handleFileSelect} />
+              
+              {!uploadedFile ? (
+                <>
+                  <CloudUpload size={32} color="var(--text-primary)" />
+                  <div className={styles.uploadText}>Choose a file or drag & drop it here</div>
+                  <div className={styles.uploadSubtext}>JPEG, PNG, PDF, TXT upto 10MB</div>
+                  <button className={styles.browseBtn} onClick={() => fileInputRef.current?.click()}>Browse Files</button>
+                </>
+              ) : (
+                <div className={styles.filePreview}>
+                  <FileText size={24} color="var(--accent-orange)" />
+                  <div style={{flex: 1, wordBreak: 'break-all'}}>
+                    <div style={{fontWeight: 600, fontSize: 14}}>{uploadedFileName}</div>
+                    <div style={{fontSize: 12, color: 'var(--text-secondary)'}}>Ready to process</div>
+                  </div>
+                  <X size={20} color="var(--text-secondary)" style={{cursor: 'pointer'}} onClick={(e) => { e.stopPropagation(); setUploadedFile(null); }} />
+                </div>
+              )}
             </div>
-            <div className={styles.uploadHint}>Upload images of your preferred document/image</div>
+            <div className={styles.uploadHint}>Upload documents (syllabus/notes) to guide AI generation</div>
 
             <div className={styles.formGroup}>
               <label className={styles.label}>Due Date</label>
@@ -195,7 +274,7 @@ export default function Home() {
                     {qt.name}
                     <ChevronDown size={16} />
                   </div>
-                  <X size={16} color="var(--text-secondary)" style={{cursor: 'pointer'}} />
+                  <X size={16} color="var(--text-secondary)" style={{cursor: 'pointer'}} onClick={(e) => { e.stopPropagation(); removeQuestionType(qt.id); }} />
                 </div>
                 
                 <div className={styles.stepper}>
@@ -212,7 +291,7 @@ export default function Home() {
               </div>
             ))}
 
-            <button className={styles.addTypeBtn}>
+            <button className={styles.addTypeBtn} onClick={addQuestionType}>
               <div className={styles.addIcon}><Plus size={16} /></div>
               Add Question Type
             </button>
@@ -231,7 +310,12 @@ export default function Home() {
                   value={additionalInstructions}
                   onChange={(e) => setAdditionalInstructions(e.target.value)}
                 />
-                <Mic className={styles.micIcon} size={20} />
+                <Mic 
+                  className={`${styles.micIcon} ${isRecording ? styles.recording : ''}`} 
+                  size={20} 
+                  onClick={handleVoiceInput}
+                  style={{cursor: 'pointer'}}
+                />
               </div>
             </div>
           </div>
@@ -249,5 +333,13 @@ export default function Home() {
         </>
       )}
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div style={{padding: 24}}>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   );
 }

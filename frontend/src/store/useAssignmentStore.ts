@@ -14,6 +14,8 @@ export interface AssignmentState {
   assignmentId: string | null;
   status: 'IDLE' | 'PENDING' | 'GENERATING' | 'COMPLETED' | 'FAILED';
   paperData: any | null;
+  uploadedFile: File | null;
+  uploadedFileName: string;
   
   setDueDate: (date: string) => void;
   updateQuestionType: (id: string, count: number, marks: number) => void;
@@ -21,6 +23,9 @@ export interface AssignmentState {
   setStatus: (status: 'IDLE' | 'PENDING' | 'GENERATING' | 'COMPLETED' | 'FAILED') => void;
   setAssignmentId: (id: string) => void;
   setPaperData: (data: any) => void;
+  addQuestionType: () => void;
+  removeQuestionType: (id: string) => void;
+  setUploadedFile: (file: File | null) => void;
   reset: () => void;
 }
 
@@ -38,6 +43,8 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
   assignmentId: null,
   status: 'IDLE',
   paperData: null,
+  uploadedFile: null,
+  uploadedFileName: '',
 
   setDueDate: (date) => set({ dueDate: date }),
   updateQuestionType: (id, count, marks) => set((state) => ({
@@ -49,12 +56,35 @@ export const useAssignmentStore = create<AssignmentState>((set) => ({
   setStatus: (status) => set({ status }),
   setAssignmentId: (id) => set({ assignmentId: id }),
   setPaperData: (data) => set({ paperData: data }),
+  addQuestionType: () => set((state) => ({
+    questionTypes: [
+      ...state.questionTypes,
+      {
+        id: `custom_${Date.now()}`,
+        name: 'Custom Question',
+        count: 1,
+        marks: 1,
+      }
+    ]
+  })),
+  removeQuestionType: (id) => set((state) => {
+    if (state.questionTypes.length <= 1) return state;
+    return {
+      questionTypes: state.questionTypes.filter((qt) => qt.id !== id)
+    };
+  }),
+  setUploadedFile: (file) => set({
+    uploadedFile: file,
+    uploadedFileName: file ? file.name : '',
+  }),
   reset: () => set({ 
     dueDate: '', 
     questionTypes: initialQuestionTypes, 
     additionalInstructions: '', 
     assignmentId: null, 
     status: 'IDLE', 
-    paperData: null 
+    paperData: null,
+    uploadedFile: null,
+    uploadedFileName: '',
   }),
 }));

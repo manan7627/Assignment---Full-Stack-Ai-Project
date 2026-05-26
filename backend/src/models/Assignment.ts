@@ -14,6 +14,9 @@ export interface ISection {
 
 export interface IAssignment extends Document {
   status: 'PENDING' | 'GENERATING' | 'COMPLETED' | 'FAILED';
+  title: string;
+  subject: string;
+  fileContent: string;
   dueDate: Date;
   questionTypes: string[];
   totalQuestions: number;
@@ -39,6 +42,9 @@ const SectionSchema: Schema = new Schema({
 
 const AssignmentSchema: Schema = new Schema({
   status: { type: String, enum: ['PENDING', 'GENERATING', 'COMPLETED', 'FAILED'], default: 'PENDING' },
+  title: { type: String, default: '' },
+  subject: { type: String, default: 'General' },
+  fileContent: { type: String, default: '' },
   dueDate: { type: Date, required: true },
   questionTypes: { type: [String], required: true },
   totalQuestions: { type: Number, required: true },

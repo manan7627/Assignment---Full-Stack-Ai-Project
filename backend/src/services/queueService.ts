@@ -34,6 +34,11 @@ class InMemoryQueue extends EventEmitter {
       const assignment = await Assignment.findById(assignmentId);
       if (!assignment) throw new Error("Assignment not found");
 
+      // Auto-generate title if not set
+      if (!assignment.title) {
+        assignment.title = `Assessment - ${new Date(assignment.dueDate).toLocaleDateString()}`;
+      }
+
       assignment.status = 'GENERATING';
       await assignment.save();
       broadcastStatus(assignmentId, 'GENERATING');
@@ -43,7 +48,8 @@ class InMemoryQueue extends EventEmitter {
         assignment.totalQuestions,
         assignment.totalMarks,
         assignment.questionTypes,
-        assignment.additionalInstructions
+        assignment.additionalInstructions,
+        assignment.fileContent || ''
       );
 
       assignment.sections = sections;
