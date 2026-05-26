@@ -128,12 +128,12 @@ function HomeContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           dueDate,
-          questionTypes: questionTypes.map(qt => qt.name), // Still sending names for backward compatibility
+          questionTypes: questionTypes.map(qt => qt.name),
           totalQuestions,
           totalMarks,
           additionalInstructions,
           fileContent,
-          fullQuestionTypes: questionTypes, // Send the full payload too
+          fullQuestionTypes: questionTypes,
           subject,
           grade
         })

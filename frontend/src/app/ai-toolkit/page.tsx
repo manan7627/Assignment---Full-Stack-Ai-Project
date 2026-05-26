@@ -11,7 +11,6 @@ export default function AIToolkit() {
   const [stats, setStats] = useState({ qGen: 0, schools: 0, uptime: 0 });
 
   useEffect(() => {
-    // Animate stats counting up
     let qGen = 0;
     let schools = 0;
     let uptime = 0;
@@ -47,7 +46,6 @@ export default function AIToolkit() {
       </div>
 
       <div className={styles.grid}>
-        {/* Tool 1 - Active */}
         <div className={styles.card} onClick={() => router.push('/?view=create')} style={{cursor: 'pointer'}}>
           <div className={styles.cardHeader}>
             <div className={styles.iconWrapper} style={{background: 'linear-gradient(135deg, #FF6A00 0%, #EE0979 100%)', color: 'white'}}>
@@ -62,11 +60,10 @@ export default function AIToolkit() {
           </div>
         </div>
 
-        {/* Tool 2 - Coming Soon */}
         <div className={styles.cardDisabled}>
           <div className={styles.cardHeader}>
             <div className={styles.iconWrapperDisabled}>
-              <BookOpen size={24} />
+               <BookOpen size={24} />
             </div>
             <div className={styles.soonTag}>Coming Soon</div>
           </div>
@@ -74,7 +71,6 @@ export default function AIToolkit() {
           <p className={styles.cardDesc}>Upload your syllabus for smart analysis and automatic lesson plan generation.</p>
         </div>
 
-        {/* Tool 3 - Coming Soon */}
         <div className={styles.cardDisabled}>
           <div className={styles.cardHeader}>
             <div className={styles.iconWrapperDisabled}>
@@ -86,7 +82,6 @@ export default function AIToolkit() {
           <p className={styles.cardDesc}>Automatically generate comprehensive study materials from your class notes.</p>
         </div>
 
-        {/* Tool 4 - Premium */}
         <div className={styles.cardDisabled}>
           <div className={styles.cardHeader}>
             <div className={styles.iconWrapperDisabled}>

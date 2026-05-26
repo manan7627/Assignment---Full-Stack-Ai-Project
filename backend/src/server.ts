@@ -24,13 +24,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Initialize WebSocket
 initWebSocket(server);
 
-// MongoDB connection
 connectDB();
 
-// Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -38,7 +35,7 @@ if (!fs.existsSync(uploadsDir)) {
 
 const upload = multer({ 
   dest: uploadsDir,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['.pdf', '.txt', '.png', '.jpg', '.jpeg'];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -50,12 +47,10 @@ const upload = multer({
   }
 });
 
-// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Stats endpoint (must be before /:id)
 app.get('/api/assignments/stats', async (req, res) => {
   try {
     const total = await Assignment.countDocuments();
@@ -68,7 +63,6 @@ app.get('/api/assignments/stats', async (req, res) => {
   }
 });
 
-// File upload endpoint
 app.post('/api/upload', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
@@ -84,12 +78,11 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       extractedText = fs.readFileSync(req.file.path, 'utf-8');
     }
     
-    // Clean up uploaded file
     fs.unlinkSync(req.file.path);
     
     res.json({ 
       fileName: req.file.originalname,
-      extractedText: extractedText.substring(0, 5000), // limit
+      extractedText: extractedText.substring(0, 5000),
       success: true 
     });
   } catch (error) {
@@ -121,7 +114,6 @@ app.post('/api/assignments', async (req, res) => {
 
     await assignment.save();
 
-    // Add job to queue
     await assessmentQueue.add('generateAssessment', { assignmentId: assignment._id.toString() });
 
     res.status(201).json({ message: 'Assignment creation started', assignmentId: assignment._id });
@@ -143,7 +135,6 @@ app.get('/api/assignments/:id', async (req, res) => {
   }
 });
 
-// Get all assignments
 app.get('/api/assignments', async (req, res) => {
   try {
     const assignments = await Assignment.find().sort({ createdAt: -1 });
@@ -153,7 +144,6 @@ app.get('/api/assignments', async (req, res) => {
   }
 });
 
-// Delete assignment
 app.delete('/api/assignments/:id', async (req, res) => {
   try {
     await Assignment.findByIdAndDelete(req.params.id);
@@ -163,7 +153,6 @@ app.delete('/api/assignments/:id', async (req, res) => {
   }
 });
 
-// Regenerate assignment
 app.post('/api/assignments/:id/regenerate', async (req, res) => {
   try {
     const assignment = await Assignment.findById(req.params.id);

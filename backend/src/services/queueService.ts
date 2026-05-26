@@ -12,7 +12,6 @@ class InMemoryQueue extends EventEmitter {
     this.queue.push(job);
     console.log(`Job added to queue: ${job.id}`);
     
-    // Asynchronously start processing
     setTimeout(() => this.processNext(), 0);
     return job;
   }
@@ -34,7 +33,6 @@ class InMemoryQueue extends EventEmitter {
       const assignment = await Assignment.findById(assignmentId);
       if (!assignment) throw new Error("Assignment not found");
 
-      // Auto-generate title if not set
       if (!assignment.title) {
         assignment.title = `Assessment - ${new Date(assignment.dueDate).toLocaleDateString()}`;
       }
@@ -43,7 +41,6 @@ class InMemoryQueue extends EventEmitter {
       await assignment.save();
       broadcastStatus(assignmentId, 'GENERATING');
 
-      // Call AI Service
       const sections = await generateAssessmentPaper(
         assignment.totalQuestions,
         assignment.totalMarks,

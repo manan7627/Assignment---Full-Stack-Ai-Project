@@ -16,7 +16,6 @@ export default function Paper() {
   const [wsError, setWsError] = useState(false);
 
   useEffect(() => {
-    // Fetch initial state
     const fetchAssignment = async () => {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -34,7 +33,6 @@ export default function Paper() {
     };
     fetchAssignment();
 
-    // Setup WebSocket
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:5000';
     const ws = new WebSocket(wsUrl);
     ws.onmessage = (event) => {
@@ -42,8 +40,7 @@ export default function Paper() {
       if (data.assignmentId === id) {
         setStatus(data.status);
         if (data.status === 'COMPLETED' && data.sections) {
-          setPaperData(data); // Using the data from WS
-          // Trigger a fetch to get full assignment data
+          setPaperData(data);
           fetchAssignment();
         } else if (data.status === 'FAILED') {
           alert('Generation failed: ' + data.error);
@@ -58,7 +55,6 @@ export default function Paper() {
   const handleDownloadPDF = async () => {
     if (!paperRef.current) return;
     
-    // Add print class to hide elements during canvas capture
     paperRef.current.classList.add(styles.isPrinting);
     
     try {
